@@ -1,0 +1,34 @@
+service: cognito-oauth
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  profile: sdom
+  region: me-central-1
+  stage: dev
+
+functions:
+  authorize:
+    handler: index.authorize
+    events:
+      - httpApi:
+          path: /authorize
+          method: get
+
+  token:
+    handler: index.token
+    events:
+      - httpApi:
+          path: /token
+          method: post
+
+  jwks:
+    handler: index.jwks
+    events:
+      - httpApi:
+          path: /jwks
+          method: get
+
+resources:
+  - ${file(cognito.yml)}

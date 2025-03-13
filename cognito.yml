@@ -1,0 +1,73 @@
+Resources:
+  CognitoOIDCProvider:
+    Type: AWS::Cognito::UserPoolIdentityProvider
+    Properties:
+      UserPoolId: !Ref APICognitoUserPool
+      ProviderName: TelegramOIDC
+      ProviderType: OIDC
+      ProviderDetails:
+        client_id: "your_client_id" # Dummy, can't leave empty
+        client_secret: "your_client_secret" # Dummy, can't leave empty
+        authorize_scopes: "openid profile email"
+        attributes_request_method: "GET"
+        oidc_issuer: https://o6q4egqemj.execute-api.me-central-1.amazonaws.com
+        jwks_uri: https://o6q4egqemj.execute-api.me-central-1.amazonaws.com/jwks
+        authorize_url: https://o6q4egqemj.execute-api.me-central-1.amazonaws.com/authorize
+        token_url: https://o6q4egqemj.execute-api.me-central-1.amazonaws.com/token
+      AttributeMapping:
+        email: "id"
+        name: "first_name"
+
+  CognitoUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: MyOIDCClient
+      UserPoolId: !Ref APICognitoUserPool
+      GenerateSecret: true
+      ExplicitAuthFlows:
+        - ALLOW_USER_PASSWORD_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+        - ALLOW_CUSTOM_AUTH
+      SupportedIdentityProviders:
+        - COGNITO
+        # - TelegramOIDC
+      CallbackURLs:
+        - http://localhost:3000/dev/auth
+      LogoutURLs:
+        - http://localhost:3000/dev/logout
+      AllowedOAuthFlows:
+        - code
+        - implicit
+      AllowedOAuthScopes:
+        - openid
+        - profile
+        - email
+      AllowedOAuthFlowsUserPoolClient: true
+      PreventUserExistenceErrors: ENABLED
+
+  APICognitoUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: gt-userpool-${self:provider.stage}
+      AutoVerifiedAttributes:
+        - email
+      UsernameConfiguration:
+        CaseSensitive: false
+      Schema:
+        - AttributeDataType: String
+          Name: profile_status
+          Required: false
+          Mutable: true
+          StringAttributeConstraints:
+            MinLength: 1
+            MaxLength: 30
+        - AttributeDataType: String
+          Name: profile_name
+          Required: false
+          Mutable: true
+        - AttributeDataType: String
+          Name: telegram_id
+          Required: false
+          Mutable: true
+      UserPoolAddOns:
+        AdvancedSecurityMode: AUDIT
