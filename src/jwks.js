@@ -1,10 +1,10 @@
-import { jwks } from './jwks.json';
+import { jwkFile } from './jwks.file';
 
-export const jwks = async () => {
+export const handler = async () => {
     return {
         statusCode: 200,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(jwks),
+        body: JSON.stringify(jwkFile),
     };
 };
 

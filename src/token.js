@@ -1,9 +1,9 @@
 import crypto from 'crypto';
 import { jwt } from 'jsonwebtoken';
 import axios from 'axios';
+import { getSecretFromS3 } from './get-secret';
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-const JWT_SECRET = process.env.JWT_SECRET;
 const OIDC_ISSUER = process.env.OIDC_ISSUER;
 
 /**
@@ -45,13 +45,15 @@ function generateToken(user) {
     exp: Math.floor(Date.now() / 1000) + 3600, // 1-hour expiration
   };
 
-  return jwt.sign(payload, JWT_SECRET, { algorithm: 'HS256' });
+  const privateKey = getSecretFromS3();
+
+  return jwt.sign(payload, privateKey, { algorithm: 'RS256' });
 }
 
 /**
  * Lambda function handler for /token API.
  */
-export const token = async (event) => {
+export const handler = async (event) => {
   try {
     const body = JSON.parse(event.body);
 
