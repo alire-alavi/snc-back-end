@@ -1,23 +1,26 @@
 service: cognito-oauth
-frameworkVersion: "3"
+frameworkVersion: "4"
 
 provider:
   name: aws
   runtime: nodejs18.x
-  profile: sdom
   region: me-central-1
   stage: dev
   environment:
-    JWT_SECRET: ${env:JWT_SECRET_KEY, ''}
+    OIDC_ISSUER: ${env:OIDC_ISSUER, ''}
+    TELEGRAM_BOT_TOKEN: ${env:TELEGRAM_BOT_TOKEN, ''}
+
 
 functions:
   userInfo:
     handler: src/user-info.handler
+    name: oauth-user-info-${self:provider.stage}
     events:
       - httpApi:
           path: /user_info
           method: get
-          authorizer: aws_iam
+          authorizer:
+            type: aws_iam
 
   authorize:
     handler: src/authorize.handler
@@ -27,19 +30,23 @@ functions:
           method: get
 
   token:
-    handler: src/token.token
+    handler: src/token.handler
+    environment:
+      SECRET_S3_BUCKET: !Ref SecureS3Bucket
     events:
       - httpApi:
           path: /token
           method: post
 
   jwks:
-    handler: handler.jwks
+    handler: src/jwks.handler
     events:
       - http:
           path: .well-known/jwks.json
           method: get
 
-
 resources:
-  - ${file(cognito.yml)}
+  - ${file(resources/cognito/client.yml)}
+  - ${file(resources/cognito/idp.yml)}
+  - ${file(resources/cognito/userpool.yml)}
+  - ${file(resources/s3.yml)}

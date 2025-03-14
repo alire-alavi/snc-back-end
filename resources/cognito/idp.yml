@@ -1,0 +1,17 @@
+Resources:
+  CognitoOIDCProvider:
+    Type: AWS::Cognito::UserPoolIdentityProvider
+    Properties:
+      UserPoolId: !Ref APICognitoUserPool
+      ProviderName: TelegramOIDC
+      ProviderType: OIDC
+      ProviderDetails:
+        client_id: "your_client_id" # Dummy, can't leave empty
+        client_secret: "your_client_secret" # Dummy, can't leave empty
+        authorize_scopes: "openid profile email"
+        attributes_request_method: "GET"
+        attributes_url: "https://o6q4egqemj.execute-api.me-central-1.amazonaws.com/user_info"
+        oidc_issuer: https://o6q4egqemj.execute-api.me-central-1.amazonaws.com
+        jwks_uri: https://9sc9cxhaii.execute-api.me-central-1.amazonaws.com/dev/.well-known/jwks.json
+        authorize_url: https://o6q4egqemj.execute-api.me-central-1.amazonaws.com/authorize
+        token_url: https://o6q4egqemj.execute-api.me-central-1.amazonaws.com/token

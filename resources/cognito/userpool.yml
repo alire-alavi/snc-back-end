@@ -1,0 +1,27 @@
+Resources:
+  APICognitoUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: gt-userpool-${self:provider.stage}
+      AutoVerifiedAttributes:
+        - email
+      UsernameConfiguration:
+        CaseSensitive: false
+      Schema:
+        - AttributeDataType: String
+          Name: profile_status
+          Required: false
+          Mutable: true
+          StringAttributeConstraints:
+            MinLength: 1
+            MaxLength: 30
+        - AttributeDataType: String
+          Name: profile_name
+          Required: false
+          Mutable: true
+        - AttributeDataType: String
+          Name: telegram_id
+          Required: false
+          Mutable: true
+      UserPoolAddOns:
+        AdvancedSecurityMode: AUDIT

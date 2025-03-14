@@ -1,0 +1,27 @@
+Resources:
+  CognitoUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: MyOIDCClient
+      UserPoolId: !Ref APICognitoUserPool
+      GenerateSecret: true
+      ExplicitAuthFlows:
+        - ALLOW_USER_PASSWORD_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+        - ALLOW_CUSTOM_AUTH
+      SupportedIdentityProviders:
+        - COGNITO
+        - TelegramOIDC
+      CallbackURLs:
+        - http://localhost:3000/dev/auth
+      LogoutURLs:
+        - http://localhost:3000/dev/logout
+      AllowedOAuthFlows:
+        - code
+        - implicit
+      AllowedOAuthScopes:
+        - openid
+        - profile
+        - email
+      AllowedOAuthFlowsUserPoolClient: true
+      PreventUserExistenceErrors: ENABLED
