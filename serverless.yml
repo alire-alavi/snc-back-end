@@ -7,28 +7,39 @@ provider:
   profile: sdom
   region: me-central-1
   stage: dev
+  environment:
+    JWT_SECRET: ${env:JWT_SECRET_KEY, ''}
 
 functions:
+  userInfo:
+    handler: src/user-info.handler
+    events:
+      - httpApi:
+          path: /user_info
+          method: get
+          authorizer: aws_iam
+
   authorize:
-    handler: index.authorize
+    handler: src/authorize.handler
     events:
       - httpApi:
           path: /authorize
           method: get
 
   token:
-    handler: index.token
+    handler: src/token.token
     events:
       - httpApi:
           path: /token
           method: post
 
   jwks:
-    handler: index.jwks
+    handler: handler.jwks
     events:
-      - httpApi:
-          path: /jwks
+      - http:
+          path: .well-known/jwks.json
           method: get
+
 
 resources:
   - ${file(cognito.yml)}

@@ -10,6 +10,7 @@ Resources:
         client_secret: "your_client_secret" # Dummy, can't leave empty
         authorize_scopes: "openid profile email"
         attributes_request_method: "GET"
+        attributes_url: "https://o6q4egqemj.execute-api.me-central-1.amazonaws.com/user_info"
         oidc_issuer: https://o6q4egqemj.execute-api.me-central-1.amazonaws.com
         jwks_uri: https://o6q4egqemj.execute-api.me-central-1.amazonaws.com/jwks
         authorize_url: https://o6q4egqemj.execute-api.me-central-1.amazonaws.com/authorize
