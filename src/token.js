@@ -1,7 +1,7 @@
 import crypto from 'crypto';
-import { jwt } from 'jsonwebtoken';
-import axios from 'axios';
-import { getSecretFromS3 } from './get-secret';
+import pkg from 'jsonwebtoken';
+import { getSecretFromS3 } from './get-secret.js';
+const { sign } =  pkg;
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const OIDC_ISSUER = process.env.OIDC_ISSUER;
@@ -34,7 +34,7 @@ function verifyTelegramAuth(data) {
 /**
  * Generates a JWT for the user.
  */
-function generateToken(user) {
+async function generateToken(user) {
   const payload = {
     sub: user.id.toString(), // User's Telegram ID as sub
     name: user.first_name + (user.last_name ? ` ${user.last_name}` : ''),
@@ -45,9 +45,11 @@ function generateToken(user) {
     exp: Math.floor(Date.now() / 1000) + 3600, // 1-hour expiration
   };
 
-  const privateKey = getSecretFromS3();
+  const { SECRET_S3_BUCKET } = process.env;
+  console.log(SECRET_S3_BUCKET);
+  const privateKey = await getSecretFromS3();
 
-  return jwt.sign(payload, privateKey, { algorithm: 'RS256' });
+  return sign(payload, privateKey, { algorithm: 'RS256' });
 }
 
 /**
@@ -55,9 +57,9 @@ function generateToken(user) {
  */
 export const handler = async (event) => {
   try {
-    const body = JSON.parse(event.body);
+    const data = event.queryStringParameters;
 
-    if (!verifyTelegramAuth(body)) {
+    if (!verifyTelegramAuth(data)) {
       return {
         statusCode: 400,
         body: JSON.stringify({ error: 'Invalid Telegram authentication' }),
@@ -65,7 +67,7 @@ export const handler = async (event) => {
     }
 
     // Generate JWT token
-    const token = generateToken(body);
+    const token = generateToken(data);
 
     return {
       statusCode: 200,

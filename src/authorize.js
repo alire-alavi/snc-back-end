@@ -1,4 +1,4 @@
-import { querystring } from 'querystring';
+import { stringify } from 'querystring';
 
 const TELEGRAM_BOT_USERNAME = 'gamertag_app_bot';
 const OIDC_ISSUER = process.env.OIDC_ISSUER;
@@ -19,7 +19,7 @@ export const handler = async (event) => {
     }
 
     // Construct the Telegram OAuth URL
-    const telegramOAuthUrl = `https://oauth.telegram.org/auth?${querystring.stringify(
+    const telegramOAuthUrl = `https://oauth.telegram.org/auth?${stringify(
       {
         bot_id: TELEGRAM_BOT_USERNAME,
         origin: redirect_uri,

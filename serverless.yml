@@ -11,11 +11,16 @@ provider:
     OIDC_ISSUER: ${env:OIDC_ISSUER, ''}
     TELEGRAM_BOT_TOKEN: ${env:TELEGRAM_BOT_TOKEN, ''}
 
+plugins:
+  - serverless-offline
+  - serverless-export-env
+
 
 functions:
   userInfo:
     handler: src/user-info.handler
     name: oauth-user-info-${self:provider.stage}
+    role: !GetAtt LambdaS3AccessRole.Arn
     events:
       - httpApi:
           path: /user_info
@@ -34,10 +39,11 @@ functions:
     handler: src/token.handler
     environment:
       SECRET_S3_BUCKET: !Ref SecureS3Bucket
+    role: !GetAtt LambdaS3AccessRole.Arn
     events:
       - httpApi:
           path: /token
-          method: post
+          method: get
 
   jwks:
     handler: src/jwks.handler
@@ -51,3 +57,4 @@ resources:
   - ${file(resources/cognito/idp.yml)}
   - ${file(resources/cognito/userpool.yml)}
   - ${file(resources/s3.yml)}
+  - ${file(resources/iam.yml)}
