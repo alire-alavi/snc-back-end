@@ -1,0 +1,27 @@
+Resources:
+  LambdaS3AccessRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: LambdaS3AccessRole
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: 
+                - lambda.amazonaws.com
+            Action: 
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: S3AccessPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:ListBucket
+                Resource:
+                  - arn:aws:s3:::secure-bucket-${AWS::AccountId}-${AWS::Region}
+                  - arn:aws:s3:::secure-bucket-${AWS::AccountId}-${AWS::Region}/*
+
