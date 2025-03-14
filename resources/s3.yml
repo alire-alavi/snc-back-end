@@ -1,0 +1,17 @@
+Resources:
+  SecureS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "secure-bucket-${self:provider.region}-${self:provider.stage}"
+      VersioningConfiguration:
+        Status: Enabled
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: aws:kms
+              KMSMasterKeyID: "alias/aws/s3" 
